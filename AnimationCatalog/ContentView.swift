@@ -9,7 +9,10 @@ struct AnimationCatalog: View {
         ("Modifier: Rotation and Scale", AnyView(ModifierAnimation())),
         ("Repeat and Delay", AnyView(RepeatDelayAnimation())),
         ("Chained Animation", AnyView(ChainedAnimation())),
-        ("3D Animation", AnyView(Rotation3DAnimation()))
+        ("3D Animation", AnyView(Rotation3DAnimation())),
+        ("MatchedGeometryEffect", AnyView(MatchedGeometryEffectExample())),
+        ("Animate Progress", AnyView(ProgressBarExample())),
+        ("ParallaxEffect", AnyView(ParallaxEffectExample()))
     ]
     
     var body: some View {
@@ -202,6 +205,92 @@ struct Rotation3DAnimation: View {
         .padding()
     }
 }
+
+
+struct MatchedGeometryEffectExample: View {
+    @Namespace private var animationNamespace
+    @State private var isExpanded = false
+
+    var body: some View {
+        VStack {
+            HStack {
+                // 小さい状態のRectangle
+                Rectangle()
+                    .matchedGeometryEffect(id: "rect", in: animationNamespace)
+                    .frame(width: isExpanded ? 300 : 100, height: isExpanded ? 300 : 100)
+                    .foregroundColor(isExpanded ? .blue : .red)
+                    .cornerRadius(20)
+            }
+
+            Button("Toggle Size") {
+                withAnimation {
+                    isExpanded.toggle()
+                }
+            }
+        }
+        .padding()
+    }
+}
+
+struct ProgressBarExample: View {
+    @State private var progress: CGFloat = 0.0
+
+    var body: some View {
+        VStack {
+            ZStack {
+                // 背景の円
+                Circle()
+                    .stroke(Color.gray.opacity(0.3), lineWidth: 20)
+                    .frame(width: 220, height: 220)
+                
+                // 進捗バー
+                Circle()
+                    .trim(from: 0.0, to: progress)
+                    .stroke(Color.blue, lineWidth: 20)
+                    .frame(width: 220, height: 220)
+                    .rotationEffect(.degrees(-90)) // 開始点を上に設定
+                    .animation(.linear(duration: 3), value: progress) // アニメーション設定
+            }
+            
+            Button("Animate Progress") {
+                withAnimation {
+                    progress = 1.0 // 100%進捗にアニメーション
+                }
+            }
+            .padding(.top, 20)
+        }
+        .padding()
+    }
+}
+
+struct ParallaxEffectExample: View {
+    @State private var dragAmount: CGSize = .zero
+
+    var body: some View {
+        VStack {
+            Image(systemName: "star.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 100, height: 100)
+                .offset(dragAmount)
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            dragAmount = value.translation
+                        }
+                        .onEnded { _ in
+                            withAnimation(.easeOut) {
+                                dragAmount = .zero
+                            }
+                        }
+                )
+
+            Text("Drag me!")
+        }
+        .padding()
+    }
+}
+
 
 // プレビュー
 #Preview {

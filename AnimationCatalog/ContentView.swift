@@ -12,7 +12,8 @@ struct AnimationCatalog: View {
         ("3D Animation", AnyView(Rotation3DAnimation())),
         ("MatchedGeometryEffect", AnyView(MatchedGeometryEffectExample())),
         ("Animate Progress", AnyView(ProgressBarExample())),
-        ("ParallaxEffect", AnyView(ParallaxEffectExample()))
+        ("ParallaxEffect", AnyView(ParallaxEffectExample())),
+        ("GroupAnimationExample", AnyView(GroupAnimationExample()))
     ]
     
     var body: some View {
@@ -291,6 +292,32 @@ struct ParallaxEffectExample: View {
     }
 }
 
+struct GroupAnimationExample: View {
+    @State private var isExpanded = false
+
+    var body: some View {
+        VStack {
+            Group {
+                Rectangle()
+                    .frame(width: isExpanded ? 300 : 100, height: 100)
+                    .foregroundColor(.blue)
+                    .cornerRadius(20)
+
+                Text(isExpanded ? "Expanded" : "Collapsed")
+                    .font(.title)
+                    .foregroundColor(.gray)
+                    .opacity(isExpanded ? 1 : 0.5)
+            }
+            .animation(.easeInOut(duration: 1), value: isExpanded)
+
+            Button("Toggle Size") {
+                isExpanded.toggle()
+            }
+            .padding(.top, 20)
+        }
+        .padding()
+    }
+}
 
 // プレビュー
 #Preview {
